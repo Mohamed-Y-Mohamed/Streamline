@@ -85,7 +85,7 @@ const Sidebar = () => {
           onClick={() => setShowProjects((prev) => !prev)}
           className="flex w-full items-center justify-between px-8 py-3 text-gray-500"
         >
-          <span>Projects</span>
+          <span className=''>Projects</span>
           {showProjects ? (
             <ChevronUp className="h-5 w-5" />
           ) : (
