@@ -5,14 +5,9 @@ import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
 /** Routes */
-// import authRoutes from "./routes/auth";
-// import projectRoutes from "./routes/projects";
-// import taskRoutes from "./routes/tasks";
-// import userRoutes from "./routes/users";
-// import teamRoutes from "./routes/teams";
-/** configuration */
 
-
+import projectRoutes from "./routes/projectRoutes";
+import TaskRoutes from "./routes/taskRoutes";
 dotenv.config();
 
 const app = express();
@@ -28,6 +23,10 @@ app.use(cors());
 app.get("/", (req, res) => {
     res.send("home Route");
 });
+
+app.use("/projects", projectRoutes);
+app.use("/tasks", TaskRoutes);
+
 /* Server */
 
 const PORT = process.env.PORT || 3000;
