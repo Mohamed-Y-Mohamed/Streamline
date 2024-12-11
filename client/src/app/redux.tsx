@@ -1,5 +1,5 @@
-import { use, useRef } from "react";
-import { combineReducers, configureStore  } from "@reduxjs/toolkit";
+import { useRef } from "react";
+import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import {
   TypedUseSelectorHook,
   useDispatch,
@@ -58,15 +58,14 @@ const persistedReducer = persistReducer(persistConfig, rootReducer);
 export const makeStore = () => {
   return configureStore({
     reducer: persistedReducer,
-    middleware: (getDefaultMiddleware) =>
-      getDefaultMiddleware({
+    middleware: (getDefault) =>
+      getDefault({
         serializableCheck: {
           ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
         },
       }).concat(api.middleware),
   });
 };
-
 
 /* REDUX TYPES */
 export type AppStore = ReturnType<typeof makeStore>;
@@ -81,7 +80,7 @@ export default function StoreProvider({
 }: {
   children: React.ReactNode;
 }) {
-const storeRef = useRef<AppStore>(null);
+  const storeRef = useRef<AppStore>();
   if (!storeRef.current) {
     storeRef.current = makeStore();
     setupListeners(storeRef.current.dispatch);

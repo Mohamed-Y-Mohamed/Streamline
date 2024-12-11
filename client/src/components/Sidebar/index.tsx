@@ -1,8 +1,12 @@
 "use client";
-import { useRouter } from 'next/router';
+import { useRouter } from "next/router";
 
 import { useAppDispatch, useAppSelector } from "@/app/redux";
-import { setIsSidebarCollapsed } from "@/state";
+import {
+  setIsSidebarCollapsed,
+  setShowProjects,
+  setShowPriority,
+} from "@/state";
 import {
   X,
   LucideIcon,
@@ -22,18 +26,26 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import React, { useState } from "react";
-import { usePathname } from 'next/navigation';
+import React from "react";
+import { usePathname } from "next/navigation";
+import { useGetProjectsQuery } from "@/state/api";
 
 const Sidebar = () => {
-  const [showProjects, setShowProjects] = useState(true);
-  const [showPriority, setShowPriority] = useState(true);
-
+  // Redux selectors and dispatch
   const dispatch = useAppDispatch();
   const isSidebarCollapsed = useAppSelector(
-    (state) => state.global.isSidebarCollapsed,
+    (state) => state.global.isSidebarCollapsed
   );
+  const showProjects = useAppSelector((state) => state.global.showProjects);
+  const showPriority = useAppSelector((state) => state.global.showPriority);
 
+  // Fetch projects data
+  const { data: projects, error, isLoading } = useGetProjectsQuery();
+  console.log("Projects:", projects);
+  console.log("Error:", error);
+  console.log("Loading:", isLoading);
+
+  // Sidebar class names
   const sidebarClassNames = `fixed flex flex-col h-[100%] justify-between shadow-xl
     transition-all duration-300 h-full z-40 dark:bg-black overflow-y-auto bg-white
     ${isSidebarCollapsed ? "w-0 hidden" : "w-64"}
@@ -54,7 +66,7 @@ const Sidebar = () => {
             />
             {!isSidebarCollapsed && (
               <span className="ml-3 text-xl font-bold text-gray-800 dark:text-white">
-                sTreamline
+                Streamline
               </span>
             )}
           </div>
@@ -69,7 +81,7 @@ const Sidebar = () => {
             </button>
           )}
         </div>
-        
+
         {/* NAVBAR LINKS */}
         <nav className="z-10 w-full">
           <SidebarLink icon={Home} label="Home" href="/" />
@@ -82,20 +94,29 @@ const Sidebar = () => {
 
         {/* PROJECTS LINKS */}
         <button
-          onClick={() => setShowProjects((prev) => !prev)}
+          onClick={() => dispatch(setShowProjects(!showProjects))}
           className="flex w-full items-center justify-between px-8 py-3 text-gray-500"
         >
-          <span className=''>Projects</span>
+          <span className="">Projects</span>
           {showProjects ? (
             <ChevronUp className="h-5 w-5" />
           ) : (
             <ChevronDown className="h-5 w-5" />
           )}
         </button>
+        {showProjects &&
+          projects?.map((project) => (
+            <SidebarLink
+              key={project.id}
+              icon={Briefcase}
+              label={project.name}
+              href={`/projects/${project.id}`}
+            />
+          ))}
 
         {/* PRIORITIES LINKS */}
         <button
-          onClick={() => setShowPriority((prev) => !prev)}
+          onClick={() => dispatch(setShowPriority(!showPriority))}
           className="flex w-full items-center justify-between px-8 py-3 text-gray-500"
         >
           <span>Priority</span>
@@ -107,33 +128,23 @@ const Sidebar = () => {
         </button>
         {showPriority && (
           <>
-            <SidebarLink
-              icon={AlertCircle}
-              label="Urgent"
-              href="/priority/urgent"
-            />
-            <SidebarLink
-              icon={ShieldAlert}
-              label="High"
-              href="/priority/high"
-            />
+            <SidebarLink icon={AlertCircle} label="Urgent" href="/priority/urgent" />
+            <SidebarLink icon={ShieldAlert} label="High" href="/priority/high" />
             <SidebarLink
               icon={AlertTriangle}
               label="Medium"
               href="/priority/medium"
             />
             <SidebarLink icon={AlertOctagon} label="Low" href="/priority/low" />
-            <SidebarLink
-              icon={Layers3}
-              label="Backlog"
-              href="/priority/backlog"
-            />
+            <SidebarLink icon={Layers3} label="Backlog" href="/priority/backlog" />
           </>
         )}
       </div>
     </div>
   );
 };
+
+// Sidebar Link Component
 interface SidebarLinkProps {
   href: string;
   icon: LucideIcon;
@@ -141,31 +152,23 @@ interface SidebarLinkProps {
 }
 
 const SidebarLink = ({ href, icon: Icon, label }: SidebarLinkProps) => {
-  
   const pathname = usePathname();
-  const isActive =
-    pathname === href || (pathname === "/" && href === "/dashboard");
-const screenwidth = window.innerWidth;
-const dispatch = useAppDispatch();
-  const isSidebarCollapsed = useAppSelector(
-    (state) => state.global.isSidebarCollapsed
-  );
+  const isActive = pathname === href || (pathname === "/" && href === "/dashboard");
+
   return (
     <Link href={href} className="w-full">
       <div
         className={`relative flex cursor-pointer items-center gap-3 transition-colors
            hover:bg-gray-100 dark:bg-black dark:hover:bg-gray-700 ${
-          isActive ? "bg-gray-100 text-white dark:bg-gray-600" : ""
-        } justify-start px-8 py-3`}
+             isActive ? "bg-gray-100 text-white dark:bg-gray-600" : ""
+           } justify-start px-8 py-3`}
       >
         {isActive && (
           <div className="absolute left-0 top-0 h-[100%] w-[5px] bg-blue-200" />
         )}
 
         <Icon className="h-6 w-6 text-gray-800 dark:text-gray-100" />
-        <span className={`font-medium text-gray-800 dark:text-gray-100`}>
-          {label}
-        </span>
+        <span className={`font-medium text-gray-800 dark:text-gray-100`}>{label}</span>
       </div>
     </Link>
   );

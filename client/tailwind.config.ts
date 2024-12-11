@@ -10,17 +10,18 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        white: "#ffffff",
+        white: "#f3e8ff",
         gray: {
-          100: "#f3f4f6",
-          200: "#e5e7eb",
-          300: "#d1d5db",
-          500: "#6b7280",
+          100: "#ffffff", 
+          200: "#e0c8ff",
+          300: "#ceabff",
+          400: "#ba89ff", 
+          500: "#ba89ff", 
           700: "#374151",
           800: "#1f2937",
         },
         blue: {
-          200: "#93c5fd",
+          200: "#ff6e1b",
           400: "#60a5fa",
           500: "#3b82f6",
         },

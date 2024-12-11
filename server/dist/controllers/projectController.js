@@ -5,11 +5,13 @@ const client_1 = require("@prisma/client");
 const prisma = new client_1.PrismaClient();
 const getProjects = async (req, res) => {
     try {
-        const project = await prisma.project.findMany();
-        res.json(project);
+        const projects = await prisma.project.findMany();
+        res.json(projects);
     }
     catch (error) {
-        res.status(500).json({ message: `Error creating project: ${error.message}` });
+        res
+            .status(500)
+            .json({ message: `Error retrieving projects: ${error.message}` });
     }
 };
 exports.getProjects = getProjects;
@@ -21,13 +23,15 @@ const createProject = async (req, res) => {
                 name,
                 description,
                 startDate,
-                endDate
-            }
+                endDate,
+            },
         });
         res.status(201).json(newProject);
     }
     catch (error) {
-        res.status(500).json({ message: `Error creating project: ${error.message}` });
+        res
+            .status(500)
+            .json({ message: `Error creating a project: ${error.message}` });
     }
 };
 exports.createProject = createProject;
