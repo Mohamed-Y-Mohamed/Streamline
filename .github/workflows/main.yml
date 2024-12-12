@@ -33,7 +33,7 @@ jobs:
       # Backend Setup & Tests
       - name: Install backend dependencies
         working-directory: ./server
-        run: npm install
+        run: HUSKY=0 npm install
 
       - name: Run Prisma Migrations
         working-directory: ./server
