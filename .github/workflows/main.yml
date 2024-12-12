@@ -1,0 +1,67 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: testdb
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Use Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+
+      # Backend Setup & Tests
+      - name: Install backend dependencies
+        working-directory: ./server
+        run: npm install
+
+      - name: Run Prisma Migrations
+        working-directory: ./server
+        env:
+          DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/testdb?schema=public"
+        run: npx prisma migrate deploy
+
+      - name: Run backend tests
+        working-directory: ./server
+        env:
+          DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/testdb?schema=public"
+        run: npm test
+
+      # Frontend Setup & Tests
+      - name: Install frontend dependencies
+        working-directory: ./client
+        run: npm install
+
+      - name: Build frontend
+        working-directory: ./client
+        run: npm run build
+
+      - name: Start frontend server
+        working-directory: ./client
+        run: |
+          npm start &
+          # Give Next.js server time to start
+          sleep 10
+
+      - name: Run frontend tests (Cypress)
+        working-directory: ./client
+        run: npm test
