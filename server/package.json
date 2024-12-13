@@ -36,6 +36,9 @@
     "prisma": "^6.0.1"
   },
   "scripts": {
+  "prepare": "HUSKY_GIT_DIR=../.git husky install"
+},
+  "scripts": {
     "test": "jest",
     "dev": "ts-node src/index.ts",
     "start": "node build/index.js",
