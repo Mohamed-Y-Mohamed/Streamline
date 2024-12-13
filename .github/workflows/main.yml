@@ -22,42 +22,60 @@ jobs:
           --health-retries 5
 
     steps:
+      # Step 1: Checkout the code
       - uses: actions/checkout@v2
 
+      # Step 2: Set up Node.js (use Node.js 20)
       - name: Use Node.js 20
         uses: actions/setup-node@v2
         with:
           node-version: '20'
 
+      # Step 3: Ensure Husky binary and hooks have execute permissions
       - name: Set execute permissions for Husky
-        run: chmod +x ./server/node_modules/.bin/husky || true
+        run: |
+          chmod +x ./server/node_modules/.bin/husky || true
+          chmod +x ./server/node_modules/.bin/* || true
+          chmod +x .husky/* || true
 
-      # Backend Setup
+      # Step 4: Install backend dependencies
       - name: Install backend dependencies
         working-directory: ./server
-        run: HUSKY_GIT_DIR=../.git npm install
+        run: HUSKY_GIT_DIR=../.git npm install --ignore-scripts
 
+      # Step 5: Run Prisma migrations
       - name: Run Prisma Migrations
         working-directory: ./server
         env:
           DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/testdb?schema=public"
         run: npx prisma migrate deploy
 
-      - name: Run backend tests (Jest)
+      # Step 6: Run backend tests (Jest)
+      - name: Run backend tests
         working-directory: ./server
         env:
           DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/testdb?schema=public"
         run: npm test
 
-      # Frontend Setup
+      # Step 7: Install frontend dependencies
       - name: Install frontend dependencies
         working-directory: ./client
         run: npm install
 
+      # Step 8: Build frontend
       - name: Build frontend
         working-directory: ./client
         run: npm run build
 
-      - name: Run frontend tests (Cypress)
+      # Step 9: Start frontend server
+      - name: Start frontend server
+        working-directory: ./client
+        run: |
+          npm start &
+          # Allow Next.js to fully start before testing
+          sleep 10
+
+      # Step 10: Run frontend tests (Cypress)
+      - name: Run frontend tests
         working-directory: ./client
         run: npm test
