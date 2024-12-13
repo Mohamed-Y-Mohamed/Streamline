@@ -1,50 +1,64 @@
-name: Security Test
+name: CI
 
 on: [push, pull_request]
 
 jobs:
-  security-test:
+  build-and-test:
     runs-on: ubuntu-latest
 
     services:
-      app:
-        image: node:20 # Replace with your application image or deploy the app manually
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: testdb
         ports:
-          - 3000:3000
+          - 5432:5432
         options: >-
-          --health-cmd "curl -f http://localhost:3000 || exit 1"
+          --health-cmd "pg_isready -U postgres"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
 
     steps:
-      # Step 1: Checkout the repository
-      - name: Checkout code
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
-      # Step 2: Set up Node.js
-      - name: Set up Node.js
+      - name: Use Node.js 20
         uses: actions/setup-node@v2
         with:
           node-version: '20'
 
-      # Step 3: Install dependencies and start the application
       - name: Install backend dependencies
         working-directory: ./server
         run: npm install
 
-      - name: Start backend server
+      - name: Run Prisma migrations
         working-directory: ./server
+        env:
+          DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/testdb?schema=public"
+        run: npx prisma migrate deploy
+
+      - name: Run backend tests
+        working-directory: ./server
+        env:
+          DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/testdb?schema=public"
+        run: npm test
+
+      - name: Install frontend dependencies
+        working-directory: ./client
+        run: npm install
+
+      - name: Build frontend
+        working-directory: ./client
+        run: npm run build
+
+      - name: Start frontend server
+        working-directory: ./client
         run: |
           npm start &
-          # Wait for the server to be ready
           sleep 10
 
-      # Step 4: Run OWASP ZAP scan
-      - name: Run OWASP ZAP Baseline Scan
-        uses: zaproxy/action-baseline@v0.7.0
-        with:
-          target: 'http://localhost:3000'
-          fail-action: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Run frontend tests
+        working-directory: ./client
+        run: npm test
