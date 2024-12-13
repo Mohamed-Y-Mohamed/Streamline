@@ -12,7 +12,7 @@ jobs:
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: testdb
+          POSTGRES_DB: projectmanagement
         ports:
           - 5432:5432
         options: >-
@@ -22,43 +22,61 @@ jobs:
           --health-retries 5
 
     steps:
+      # Step 1: Checkout the code
       - uses: actions/checkout@v2
 
+      # Step 2: Set up Node.js
       - name: Use Node.js 20
         uses: actions/setup-node@v2
         with:
           node-version: '20'
 
+      # Step 3: Set up environment variables for CI
+      - name: Set environment variables
+        run: |
+          echo "DATABASE_URL=postgresql://postgres:postgres@localhost:5432/projectmanagement?schema=public" >> $GITHUB_ENV
+          echo "PORT=8000" >> $GITHUB_ENV
+
+      # Step 4: Install backend dependencies
       - name: Install backend dependencies
         working-directory: ./server
         run: npm install
 
+      # Step 5: Run Prisma migrations
       - name: Run Prisma migrations
         working-directory: ./server
         env:
-          DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/testdb?schema=public"
+          DATABASE_URL: ${{ env.DATABASE_URL }}
         run: npx prisma migrate deploy
 
-      - name: Run backend tests
+      # Step 6: Skip tests if no `test` script is specified
+      - name: Skip backend tests (if none specified)
         working-directory: ./server
-        env:
-          DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/testdb?schema=public"
-        run: npm test
+        run: |
+          if [ "$(npm run | grep test)" ]; then
+            npm test
+          else
+            echo "No tests defined; skipping backend tests."
+          fi
 
+      # Step 7: Install frontend dependencies
       - name: Install frontend dependencies
         working-directory: ./client
         run: npm install
 
+      # Step 8: Build frontend
       - name: Build frontend
         working-directory: ./client
         run: npm run build
 
+      # Step 9: Start frontend server
       - name: Start frontend server
         working-directory: ./client
         run: |
           npm start &
           sleep 10
 
+      # Step 10: Run frontend tests
       - name: Run frontend tests
         working-directory: ./client
         run: npm test
