@@ -9,7 +9,6 @@
     "dev": "concurrently \"npx tsc -w\" \"nodemon --exec ts-node src/index.ts\"",
     "seed":"ts-node prisma/seed.ts"
   },
-  
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -34,14 +33,5 @@
     "helmet": "^8.0.0",
     "morgan": "^1.10.0",
     "prisma": "^6.0.1"
-  },
-  "scripts": {
-  "prepare": "HUSKY_GIT_DIR=../.git husky install"
-},
-  "scripts": {
-    "test": "jest",
-    "dev": "ts-node src/index.ts",
-    "start": "node build/index.js",
-    "prepare": "husky install"
   }
 }
