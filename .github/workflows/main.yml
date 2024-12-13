@@ -40,6 +40,11 @@ jobs:
         working-directory: ./server
         run: npm install
 
+      - name: Install backend dependencies
+        working-directory: ./server
+        run: npm install --ignore-scripts
+
+
       - name: Run Prisma Migrations
         working-directory: ./server
         env:
