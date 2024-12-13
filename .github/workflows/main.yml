@@ -29,11 +29,16 @@ jobs:
         with:
           node-version: '20'
 
+      # If you have a root package.json that includes husky and prepare scripts:
+      - name: Install root dependencies (if any)
+        run: npm install
+        # This will trigger "prepare" script at root, thus running `husky install`
+        # If no root package.json exists, you can remove this step.
 
       # Backend Setup & Tests
       - name: Install backend dependencies
         working-directory: ./server
-        run: HUSKY=0 npm install
+        run: npm install
 
       - name: Run Prisma Migrations
         working-directory: ./server
@@ -41,7 +46,7 @@ jobs:
           DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/testdb?schema=public"
         run: npx prisma migrate deploy
 
-      - name: Run backend tests
+      - name: Run backend tests (Jest)
         working-directory: ./server
         env:
           DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/testdb?schema=public"
@@ -60,7 +65,7 @@ jobs:
         working-directory: ./client
         run: |
           npm start &
-          # Give Next.js server time to start
+          # Give Next.js server some time to start up
           sleep 10
 
       - name: Run frontend tests (Cypress)
