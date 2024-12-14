@@ -13,6 +13,20 @@ type BoardProps = {
 
 const taskStatus = ["To Do", "Work In Progress", "Under Review", "Completed"];
 
+/**
+ * BoardView component
+ *
+ * This component renders a Kanban board with columns for each task status.
+ * It fetches the tasks for the given project ID and renders them in the
+ * columns. The user can drag and drop tasks across columns to update the
+ * task status.
+ *
+ * @param {{ id: string, setIsModalNewTaskOpen: (isOpen: boolean) => void }}
+ *   id: The ID of the project to fetch tasks for
+ *   setIsModalNewTaskOpen: A function to open the new task modal
+ * @returns {JSX.Element} The rendered Kanban board
+ */
+
 const BoardView = ({ id, setIsModalNewTaskOpen }: BoardProps) => {
   const {
     data: tasks,
@@ -52,6 +66,16 @@ type TaskColumnProps = {
   setIsModalNewTaskOpen: (isOpen: boolean) => void;
 };
 
+/**
+ * TaskColumn component
+ *
+ * This component renders a column of tasks with a status heading and a
+ * count of tasks with that status. It also renders a button to create a
+ * new task with that status.
+ *
+ * @param {{ status: string, tasks: TaskType[], moveTask: (taskId: number, toStatus: string) => void, setIsModalNewTaskOpen: (isOpen: boolean) => void }}
+ */
+
 const TaskColumn = ({
   status,
   tasks,
@@ -69,11 +93,11 @@ const TaskColumn = ({
   const tasksCount = tasks.filter((task) => task.status === status).length;
 
   const statusColor: any = {
-  "To Do": "#6B7280", // Gray
-  "Work In Progress": "#2563EB", // Blue
-  "Under Review": "#F97316", // Orange
-  "Completed": "#10B981" // Green
-}
+    "To Do": "#6B7280", // Gray
+    "Work In Progress": "#2563EB", // Blue
+    "Under Review": "#F97316", // Orange
+    Completed: "#10B981", // Green
+  };
 
   return (
     <div
@@ -109,19 +133,18 @@ const TaskColumn = ({
             </button>
           </div>
         </div>
-        
       </div>
-{tasks
-.filter ((task) => task.status === status).map((task) => (
-  <Task key={task.id} task={task} />
-))}
-     
+      {tasks
+        .filter((task) => task.status === status)
+        .map((task) => (
+          <Task key={task.id} task={task} />
+        ))}
     </div>
   );
 };
-type TaskProps={
+type TaskProps = {
   task: TaskType;
-}
+};
 const Task = ({ task }: TaskProps) => {
   const [{ isDragging }, drag] = useDrag(() => ({
     type: "task",
@@ -140,7 +163,22 @@ const Task = ({ task }: TaskProps) => {
     ? format(new Date(task.dueDate), "P")
     : "";
   const numberOfComments = (task.comments && task.comments.length) || 0;
-   const PriorityTag = ({ priority }: { priority: TaskType["priority"] }) => (
+
+  /**
+   * Renders a styled tag representing the priority level of a task.
+   * The tag is color-coded based on the priority:
+   * - "Urgent" is red
+   * - "High" is yellow
+   * - "Medium" is green
+   * - "Low" is blue
+   * - Any other priority is gray
+   *
+   * @param {Object} props - Component props
+   * @param {TaskType["priority"]} props.priority - The priority level of the task
+   * @returns A JSX element displaying the priority as a styled tag
+   */
+
+  const PriorityTag = ({ priority }: { priority: TaskType["priority"] }) => (
     <div
       className={`rounded-full px-2 py-1 text-xs font-semibold ${
         priority === "Urgent"
@@ -157,7 +195,7 @@ const Task = ({ task }: TaskProps) => {
       {priority}
     </div>
   );
-    return (
+  return (
     <div
       ref={(instance) => {
         drag(instance);
@@ -249,6 +287,5 @@ const Task = ({ task }: TaskProps) => {
     </div>
   );
 };
-
 
 export default BoardView;

@@ -1,3 +1,4 @@
+
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 export interface initialStateTypes {
@@ -35,3 +36,5 @@ export const globalSlice = createSlice({
 
 export const { setIsSidebarCollapsed, setIsDarkMode, setShowProjects, setShowPriority } =  globalSlice.actions;
 export default globalSlice.reducer;
+
+

@@ -1,7 +1,7 @@
 "use client";
 import { useRouter } from "next/router";
 
-import { useAppDispatch, useAppSelector } from "@/app/redux";
+import { useAppDispatch, useAppSelector } from "@/app/root/redux";
 import {
   setIsSidebarCollapsed,
   setShowProjects,
@@ -85,6 +85,8 @@ const Sidebar = () => {
         {/* NAVBAR LINKS */}
         <nav className="z-10 w-full">
           <SidebarLink icon={Home} label="Home" href="/" />
+          {/* <SidebarLink icon={Dashboard} label="Home" href="/Dashboard" /> */}
+
           <SidebarLink icon={Briefcase} label="Timeline" href="/timeline" />
           <SidebarLink icon={Search} label="Search" href="/search" />
           <SidebarLink icon={Settings} label="Settings" href="/settings" />
@@ -110,7 +112,7 @@ const Sidebar = () => {
               key={project.id}
               icon={Briefcase}
               label={project.name}
-              href={`/projects/${project.id}`}
+              href={`/root/projects/${project.id}`}
             />
           ))}
 
@@ -128,15 +130,27 @@ const Sidebar = () => {
         </button>
         {showPriority && (
           <>
-            <SidebarLink icon={AlertCircle} label="Urgent" href="/priority/urgent" />
-            <SidebarLink icon={ShieldAlert} label="High" href="/priority/high" />
+            <SidebarLink
+              icon={AlertCircle}
+              label="Urgent"
+              href="/priority/urgent"
+            />
+            <SidebarLink
+              icon={ShieldAlert}
+              label="High"
+              href="/priority/high"
+            />
             <SidebarLink
               icon={AlertTriangle}
               label="Medium"
               href="/priority/medium"
             />
             <SidebarLink icon={AlertOctagon} label="Low" href="/priority/low" />
-            <SidebarLink icon={Layers3} label="Backlog" href="/priority/backlog" />
+            <SidebarLink
+              icon={Layers3}
+              label="Backlog"
+              href="/priority/backlog"
+            />
           </>
         )}
       </div>
@@ -153,7 +167,8 @@ interface SidebarLinkProps {
 
 const SidebarLink = ({ href, icon: Icon, label }: SidebarLinkProps) => {
   const pathname = usePathname();
-  const isActive = pathname === href || (pathname === "/" && href === "/dashboard");
+  const isActive =
+    pathname === href || (pathname === "/" && href === "/dashboard");
 
   return (
     <Link href={href} className="w-full">
@@ -168,7 +183,9 @@ const SidebarLink = ({ href, icon: Icon, label }: SidebarLinkProps) => {
         )}
 
         <Icon className="h-6 w-6 text-gray-800 dark:text-gray-100" />
-        <span className={`font-medium text-gray-800 dark:text-gray-100`}>{label}</span>
+        <span className={`font-medium text-gray-800 dark:text-gray-100`}>
+          {label}
+        </span>
       </div>
     </Link>
   );

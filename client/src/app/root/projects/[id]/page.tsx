@@ -3,8 +3,10 @@
 import React from "react";
 import { useParams } from "next/navigation";
 import ProjectHeader from "../ProjectHeader";
-import Board from "@/app/projects/BoardView";
-
+import Board from "@/app/root/projects/BoardView";
+import List from "../ListView";
+import Timeline from "../TimelineView";
+import Table from "../TableView";
 const Project = () => {
   // Fetch the route parameters using useParams
   const params = useParams<{ id: string }>();
@@ -25,7 +27,18 @@ const Project = () => {
         {activeTab === "Board" && (
           <Board id={projectId} setIsModalNewTaskOpen={setIsModalNewTaskOpen} />
         )}
-        {/* Add more tab-based conditional rendering as needed */}
+        {activeTab === "List" && (
+          <List id={projectId} setIsModalNewTaskOpen={setIsModalNewTaskOpen} />
+        )}
+        {activeTab === "Timeline" && (
+          <Timeline
+            id={projectId}
+            setIsModalNewTaskOpen={setIsModalNewTaskOpen}
+          />
+        )}
+        {activeTab === "Table" && (
+          <Table id={projectId} setIsModalNewTaskOpen={setIsModalNewTaskOpen} />
+        )}
       </div>
     </div>
   );
