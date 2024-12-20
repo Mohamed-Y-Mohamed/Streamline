@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import ClientLayout from "./clientLayout"; // Import client-specific functionality
-
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
