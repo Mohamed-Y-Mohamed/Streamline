@@ -8,7 +8,7 @@ import {
   useGetTasksQuery,
 } from "@/state/api";
 import React from "react";
-import { useAppSelector } from "@/app/root/redux";
+import { useAppSelector } from "@/app/redux";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import Header from "@/components/Header";
 import {

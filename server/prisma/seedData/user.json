@@ -1,0 +1,202 @@
+[
+  {
+    "username": "AliceJones",
+    "name": "Alice Jones",
+    "teamId": 1,
+    "profilePictureUrl": "p1.jpeg",
+    "email": "alice.jones@example.com",
+    "password": "12345678",
+    "googleId": null,
+    "termsAccepted": true
+  },
+  {
+    "username": "BobSmith",
+    "name": "Bob Smith",
+    "teamId": 2,
+    "profilePictureUrl": "p2.jpeg",
+    "email": "bob.smith@example.com",
+    "password": "$2b$10$examplehashedpassword002",
+    "googleId": null,
+    "termsAccepted": true
+  },
+  {
+    "username": "CarolWhite",
+    "name": "Carol White",
+    "teamId": 3,
+    "profilePictureUrl": "p3.jpeg",
+    "email": "carol.white@example.com",
+    "password": "$2b$10$examplehashedpassword003",
+    "googleId": null,
+    "termsAccepted": true
+  },
+  {
+    "username": "DaveBrown",
+    "name": "Dave Brown",
+    "teamId": 4,
+    "profilePictureUrl": "p4.jpeg",
+    "email": "dave.brown@example.com",
+    "password": "$2b$10$examplehashedpassword004",
+    "googleId": null,
+    "termsAccepted": true
+  },
+  {
+    "username": "EveClark",
+    "name": "Eve Clark",
+    "teamId": 5,
+    "profilePictureUrl": "p5.jpeg",
+    "email": "eve.clark@example.com",
+    "password": "$2b$10$examplehashedpassword005",
+    "googleId": null,
+    "termsAccepted": true
+  },
+  {
+    "username": "FrankWright",
+    "name": "Frank Wright",
+    "teamId": 1,
+    "profilePictureUrl": "p6.jpeg",
+    "email": "frank.wright@example.com",
+    "password": "$2b$10$examplehashedpassword006",
+    "googleId": null,
+    "termsAccepted": true
+  },
+  {
+    "username": "GraceHall",
+    "name": "Grace Hall",
+    "teamId": 2,
+    "profilePictureUrl": "p7.jpeg",
+    "email": "grace.hall@example.com",
+    "password": "$2b$10$examplehashedpassword007",
+    "googleId": null,
+    "termsAccepted": true
+  },
+  {
+    "username": "HenryAllen",
+    "name": "Henry Allen",
+    "teamId": 3,
+    "profilePictureUrl": "p8.jpeg",
+    "email": "henry.allen@example.com",
+    "password": "$2b$10$examplehashedpassword008",
+    "googleId": null,
+    "termsAccepted": true
+  },
+  {
+    "username": "IdaMartin",
+    "name": "Ida Martin",
+    "teamId": 4,
+    "profilePictureUrl": "p9.jpeg",
+    "email": "ida.martin@example.com",
+    "password": "$2b$10$examplehashedpassword009",
+    "googleId": null,
+    "termsAccepted": true
+  },
+  {
+    "username": "JohnDoe",
+    "name": "John Doe",
+    "teamId": 5,
+    "profilePictureUrl": "p10.jpeg",
+    "email": "john.doe@example.com",
+    "password": "$2b$10$examplehashedpassword010",
+    "googleId": null,
+    "termsAccepted": true
+  },
+  {
+    "username": "LauraAdams",
+    "name": "Laura Adams",
+    "teamId": 1,
+    "profilePictureUrl": "p11.jpeg",
+    "email": "laura.adams@example.com",
+    "password": "$2b$10$examplehashedpassword011",
+    "googleId": null,
+    "termsAccepted": true
+  },
+  {
+    "username": "NormanBates",
+    "name": "Norman Bates",
+    "teamId": 2,
+    "profilePictureUrl": "p12.jpeg",
+    "email": "norman.bates@example.com",
+    "password": "$2b$10$examplehashedpassword012",
+    "googleId": null,
+    "termsAccepted": true
+  },
+  {
+    "username": "OliviaPace",
+    "name": "Olivia Pace",
+    "teamId": 3,
+    "profilePictureUrl": "p13.jpeg",
+    "email": "olivia.pace@example.com",
+    "password": "$2b$10$examplehashedpassword013",
+    "googleId": null,
+    "termsAccepted": true
+  },
+  {
+    "username": "PeterQuill",
+    "name": "Peter Quill",
+    "teamId": 4,
+    "profilePictureUrl": "p1.jpeg",
+    "email": "peter.quill@example.com",
+    "password": "$2b$10$examplehashedpassword014",
+    "googleId": null,
+    "termsAccepted": true
+  },
+  {
+    "username": "QuincyAdams",
+    "name": "Quincy Adams",
+    "teamId": 5,
+    "profilePictureUrl": "p2.jpeg",
+    "email": "quincy.adams@example.com",
+    "password": "$2b$10$examplehashedpassword015",
+    "googleId": null,
+    "termsAccepted": true
+  },
+  {
+    "username": "RachelGreen",
+    "name": "Rachel Green",
+    "teamId": 1,
+    "profilePictureUrl": "p3.jpeg",
+    "email": "rachel.green@example.com",
+    "password": "$2b$10$examplehashedpassword016",
+    "googleId": null,
+    "termsAccepted": true
+  },
+  {
+    "username": "SteveJobs",
+    "name": "Steve Jobs",
+    "teamId": 2,
+    "profilePictureUrl": "p4.jpeg",
+    "email": "steve.jobs@example.com",
+    "password": "$2b$10$examplehashedpassword017",
+    "googleId": null,
+    "termsAccepted": true
+  },
+  {
+    "username": "TinaFey",
+    "name": "Tina Fey",
+    "teamId": 3,
+    "profilePictureUrl": "p5.jpeg",
+    "email": "tina.fey@example.com",
+    "password": "$2b$10$examplehashedpassword018",
+    "googleId": null,
+    "termsAccepted": true
+  },
+  {
+    "username": "UrsulaMonroe",
+    "name": "Ursula Monroe",
+    "teamId": 4,
+    "profilePictureUrl": "p6.jpeg",
+    "email": "ursula.monroe@example.com",
+    "password": "$2b$10$examplehashedpassword019",
+    "googleId": null,
+    "termsAccepted": true
+  },
+  {
+    "username": "VictorHugo",
+    "name": "Victor Hugo",
+    "teamId": 5,
+    "profilePictureUrl": "p7.jpeg",
+    "email": "victor.hugo@example.com",
+    "password": "$2b$10$examplehashedpassword020",
+    "googleId": null,
+    "termsAccepted": true
+  }
+]

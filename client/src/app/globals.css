@@ -7,7 +7,14 @@
 *::after {
   box-sizing: border-box;
 }
-
+.date-input::-webkit-calendar-picker-indicator {
+  color: #000000; /* Set your desired color */
+  filter: invert(0.5) sepia(1) saturate(5) hue-rotate(200deg); /* Optional: Modify icon appearance */
+}
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--secondary) var(--primary);
+}
 html,
 body,
 #root,

@@ -1,5 +1,4 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-// import { fetchAuthSession, getCurrentUser } from "aws-amplify/auth";
 
 export interface Project {
   id: number;
@@ -29,8 +28,9 @@ export interface User {
   username: string;
   email: string;
   profilePictureUrl?: string;
-  cognitoId?: string;
+  googleId?: string;
   teamId?: number;
+  termsAccepted?: boolean;
 }
 
 export interface Attachment {
@@ -74,58 +74,129 @@ export interface Team {
   projectManagerUserId?: number;
 }
 
-export const api = createApi({
+// Adjusted response types to match what the backend actually returns
+interface AuthResponse {
+  message: string;
+  user: User;
+}
 
+interface RegisterResponse {
+  message: string;
+  user: User;
+}
+
+export const api = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: process.env.NEXT_PUBLIC_BASE_URL,
+    credentials: 'include', // ensure cookies are included
   }),
   reducerPath: "api",
-  tagTypes: ["Projects","Tasks"],
+  tagTypes: ["Projects", "Tasks", "Users"],
+
   endpoints: (build) => ({
-    getProjects:build.query<Project[], void>({
+    // Fetch Projects
+    getProjects: build.query<Project[], void>({
       query: () => "projects",
-      providesTags: ["Projects"]
+      providesTags: ["Projects"],
     }),
-    createProject : build.mutation<Project, Partial<Project>>({
+
+    // Create a New Project
+    createProject: build.mutation<Project, Partial<Project>>({
       query: (project) => ({
         url: "projects",
         method: "POST",
-        body: project
+        body: project,
       }),
-      invalidatesTags: ["Projects"]
+      invalidatesTags: ["Projects"],
     }),
-      getTasks:build.query<Task[], {projectId:number}>({
-      query: ({projectId}) => `tasks?projectId=${projectId}`,
-      providesTags: (result) => 
-        result 
-        ? result.map(({id})=> ({type:"Tasks" as const ,id}))
-        :["Tasks" as const],
 
+    // Fetch Tasks by Project ID
+    getTasks: build.query<Task[], { projectId: number }>({
+      query: ({ projectId }) => `tasks?projectId=${projectId}`,
+      providesTags: (result) =>
+        result
+          ? result.map(({ id }) => ({ type: "Tasks" as const, id }))
+          : ["Tasks" as const],
     }),
-    createTask : build.mutation<Task, Partial<Project>>({
-      query: (project) => ({
+
+    // Create a New Task
+    createTask: build.mutation<Task, Partial<Task>>({
+      query: (task) => ({
         url: "tasks",
         method: "POST",
-        body: project
+        body: task,
       }),
-      invalidatesTags: ["Tasks"]
+      invalidatesTags: ["Tasks"],
     }),
-      updateTaskStatus: build.mutation<Task, { taskId: number; status: string }>({
+
+    // Update Task Status
+    updateTaskStatus: build.mutation<Task, { taskId: number; status: string }>({
       query: ({ taskId, status }) => ({
         url: `tasks/${taskId}/status`,
         method: "PATCH",
         body: { status },
       }),
-      invalidatesTags: (result, error, { taskId }) => [
-        { type: "Tasks", id: taskId },
-      ],
+      invalidatesTags: (result, error, { taskId }) => [{ type: "Tasks", id: taskId }],
     }),
+
+    // User Registration
+    registerUser: build.mutation<RegisterResponse, Partial<User>>({
+      query: (user) => ({
+        url: "auth/register",
+        method: "POST",
+        body: user,
+      }),
+    }),
+
+    // Google Sign-In
+    googleSignIn: build.mutation<AuthResponse, { idToken: string }>({
+      query: (payload) => ({
+        url: "auth/google-signin",
+        method: "POST",
+        body: payload,
+      }),
+    }),
+
+    // Regular Sign-In
+    signIn: build.mutation<AuthResponse, { email: string; password: string }>({
+      query: (credentials) => ({
+        url: "auth/signin",
+        method: "POST",
+        body: credentials,
+      }),
+    }),
+
+    // Search for Projects, Tasks, or Users
+    search: build.query<SearchResults, string>({
+      query: (query) => `search?query=${query}`,
+    }),
+    signOut: build.mutation<{ message: string }, void>({
+  query: () => ({
+    url: "auth/signout",
+    method: "POST",
   }),
-})
-export const {useGetProjectsQuery, useCreateProjectMutation, useGetTasksQuery, useCreateTaskMutation,useUpdateTaskStatusMutation} =api;
+}),
+
+getUserDetails: build.query<User, void>({
+  query: () => "auth/user",
+}),
 
 
+  }),
+  
+});
 
+// Export Hooks for Components
+export const {
+  useGetProjectsQuery,
+  useCreateProjectMutation,
+  useGetTasksQuery,
+  useCreateTaskMutation,
+  useUpdateTaskStatusMutation,
+  useRegisterUserMutation,
+  useGoogleSignInMutation,
+  useSignInMutation,
+  useSignOutMutation, 
+    useGetUserDetailsQuery, 
 
-
-
+} = api;

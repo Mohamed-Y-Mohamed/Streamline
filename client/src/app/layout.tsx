@@ -1,8 +1,7 @@
-// src/app/layout.tsx
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { DarkModeProvider } from "./darkController";
+import ClientLayout from "./clientLayout"; // Import client-specific functionality
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -15,16 +14,13 @@ export const metadata: Metadata = {
   },
 };
 
-export default function GlobalLayout({
+export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <head>{/* Metadata is applied automatically here */}</head>
       <body className={inter.className}>
-        <DarkModeProvider>{children}</DarkModeProvider>
+        <ClientLayout>{children}</ClientLayout>
       </body>
     </html>
   );

@@ -1,17 +1,38 @@
 "use client";
 import React from "react";
-import { Menu, Moon, Search, Settings, Sun, User } from "lucide-react";
+import { Menu, Moon, Search, Settings, Sun } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import { useAppDispatch, useAppSelector } from "@/app/root/redux";
+import { useRouter } from "next/navigation";
+import { useAppDispatch, useAppSelector } from "@/app/redux";
 import { setIsDarkMode, setIsSidebarCollapsed } from "@/state";
+import { useSignOutMutation, useGetUserDetailsQuery } from "@/state/api";
 
 const Navbar = () => {
   const dispatch = useAppDispatch();
+  const router = useRouter();
   const isSidebarCollapsed = useAppSelector(
     (state) => state.global.isSidebarCollapsed
   );
   const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
+
+  const {
+    data: user,
+    isLoading: isUserLoading,
+    error: userError,
+  } = useGetUserDetailsQuery();
+
+  const [signOut, { isLoading: isSigningOut }] = useSignOutMutation();
+
+  // Handle sign out
+  const handleSignOut = async () => {
+    try {
+      await signOut().unwrap();
+      router.push("/auth/signin");
+    } catch (error) {
+      console.error("Error during sign out:", error);
+    }
+  };
 
   return (
     <div className="flex items-center justify-between bg-white px-4 py-3 dark:bg-black">
@@ -82,11 +103,29 @@ const Navbar = () => {
         {/* User Info */}
         <div className="hidden items-center justify-between md:flex">
           <div className="align-center flex h-9 w-9 justify-center">
-            <User className="h-6 w-6 cursor-pointer self-center rounded-full dark:text-white" />
+            {isUserLoading ? (
+              <div className="animate-pulse h-9 w-9 bg-gray-300 rounded-full"></div>
+            ) : (
+              <Image
+                src={user?.profilePictureUrl || "/assets/anonymous.png"}
+                alt="User Profile"
+                width={36}
+                height={36}
+                className="rounded-full object-cover"
+              />
+            )}
           </div>
-          <span className="mx-3 text-gray-800 dark:text-white">Username</span>
-          <button className="hidden rounded bg-blue-400 px-4 py-2 text-xs font-bold text-white hover:bg-blue-500 md:block">
-            Sign out
+          <span className="mx-3 text-gray-800 dark:text-white">
+            {isUserLoading ? "Loading..." : user?.username || "Guest"}
+          </span>
+          <button
+            onClick={handleSignOut}
+            disabled={isSigningOut}
+            className={`hidden rounded bg-blue-400 px-4 py-2 text-xs font-bold text-white hover:bg-blue-500 md:block ${
+              isSigningOut ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+          >
+            {isSigningOut ? "Signing out..." : "Sign out"}
           </button>
         </div>
       </div>

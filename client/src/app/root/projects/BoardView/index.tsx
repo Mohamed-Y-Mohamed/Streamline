@@ -221,7 +221,7 @@ const Task = ({ task }: TaskProps) => {
               {taskTagsSplit.map((tag) => (
                 <div
                   key={tag}
-                  className="rounded-full bg-blue-100 px-2 py-1 text-xs"
+                  className="rounded-full text-black bg-blue-100 px-2 py-1 text-xs"
                 >
                   {" "}
                   {tag}

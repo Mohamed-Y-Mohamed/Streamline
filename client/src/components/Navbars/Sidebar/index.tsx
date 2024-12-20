@@ -1,7 +1,7 @@
 "use client";
 import { useRouter } from "next/router";
 
-import { useAppDispatch, useAppSelector } from "@/app/root/redux";
+import { useAppDispatch, useAppSelector } from "@/app/redux";
 import {
   setIsSidebarCollapsed,
   setShowProjects,
@@ -23,13 +23,14 @@ import {
   AlertTriangle,
   AlertOctagon,
   Layers3,
+  CircleGauge,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 import { usePathname } from "next/navigation";
 import { useGetProjectsQuery } from "@/state/api";
-
+import Dashboard from "@/app/root/Dashboard/page";
 const Sidebar = () => {
   // Redux selectors and dispatch
   const dispatch = useAppDispatch();
@@ -85,13 +86,21 @@ const Sidebar = () => {
         {/* NAVBAR LINKS */}
         <nav className="z-10 w-full">
           <SidebarLink icon={Home} label="Home" href="/" />
-          {/* <SidebarLink icon={Dashboard} label="Home" href="/Dashboard" /> */}
+          <SidebarLink
+            icon={CircleGauge}
+            label="Dashboard"
+            href="/root/Dashboard"
+          />
 
-          <SidebarLink icon={Briefcase} label="Timeline" href="/timeline" />
-          <SidebarLink icon={Search} label="Search" href="/search" />
-          <SidebarLink icon={Settings} label="Settings" href="/settings" />
-          <SidebarLink icon={User} label="Users" href="/users" />
-          <SidebarLink icon={Users} label="Teams" href="/teams" />
+          <SidebarLink
+            icon={Briefcase}
+            label="Timeline"
+            href="/root/timeline"
+          />
+          <SidebarLink icon={Search} label="Search" href="/root/search" />
+          <SidebarLink icon={Settings} label="Settings" href="/root/settings" />
+          <SidebarLink icon={User} label="Users" href="/root/users" />
+          <SidebarLink icon={Users} label="Teams" href="/root/teams" />
         </nav>
 
         {/* PROJECTS LINKS */}

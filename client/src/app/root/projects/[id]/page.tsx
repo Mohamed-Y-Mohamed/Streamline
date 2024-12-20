@@ -1,45 +1,42 @@
 "use client";
 
-import React from "react";
-import { useParams } from "next/navigation";
-import ProjectHeader from "../ProjectHeader";
-import Board from "@/app/root/projects/BoardView";
+import React, { useState } from "react";
+import ProjectHeader from "@/app/root/projects/ProjectHeader";
+import Board from "../BoardView";
 import List from "../ListView";
 import Timeline from "../TimelineView";
 import Table from "../TableView";
-const Project = () => {
-  // Fetch the route parameters using useParams
-  const params = useParams<{ id: string }>();
+import ModalNewTask from "@/components/ModalNewTask";
 
-  if (!params || !params.id) {
-    return <div>Error: Project ID is missing</div>; // Handle missing ID
-  }
+type Props = {
+  params: { id: string };
+};
 
-  const projectId = params.id; // Get the project ID
-
-  const [activeTab, setActiveTab] = React.useState("Board");
-  const [isModalNewTaskOpen, setIsModalNewTaskOpen] = React.useState(false);
+const Project = ({ params }: Props) => {
+  const { id } = params;
+  const [activeTab, setActiveTab] = useState("Board");
+  const [isModalNewTaskOpen, setIsModalNewTaskOpen] = useState(false);
 
   return (
-    <div className="px-4 xl:px-6">
-      <div className="pb-6 pt-6 lg:pb-4 lg:pt-8">
-        <ProjectHeader activeTab={activeTab} setActiveTab={setActiveTab} />
-        {activeTab === "Board" && (
-          <Board id={projectId} setIsModalNewTaskOpen={setIsModalNewTaskOpen} />
-        )}
-        {activeTab === "List" && (
-          <List id={projectId} setIsModalNewTaskOpen={setIsModalNewTaskOpen} />
-        )}
-        {activeTab === "Timeline" && (
-          <Timeline
-            id={projectId}
-            setIsModalNewTaskOpen={setIsModalNewTaskOpen}
-          />
-        )}
-        {activeTab === "Table" && (
-          <Table id={projectId} setIsModalNewTaskOpen={setIsModalNewTaskOpen} />
-        )}
-      </div>
+    <div>
+      <ModalNewTask
+        isOpen={isModalNewTaskOpen}
+        onClose={() => setIsModalNewTaskOpen(false)}
+        id={id}
+      />
+      <ProjectHeader activeTab={activeTab} setActiveTab={setActiveTab} />
+      {activeTab === "Board" && (
+        <Board id={id} setIsModalNewTaskOpen={setIsModalNewTaskOpen} />
+      )}
+      {activeTab === "List" && (
+        <List id={id} setIsModalNewTaskOpen={setIsModalNewTaskOpen} />
+      )}
+      {activeTab === "Timeline" && (
+        <Timeline id={id} setIsModalNewTaskOpen={setIsModalNewTaskOpen} />
+      )}
+      {activeTab === "Table" && (
+        <Table id={id} setIsModalNewTaskOpen={setIsModalNewTaskOpen} />
+      )}
     </div>
   );
 };

@@ -16,17 +16,22 @@ datasource db {
 
 model User {
   userId            Int     @id @default(autoincrement())
-  cognitoId         String  @unique
-  username          String  @unique
+  email             String  @unique
+  password          String? // Nullable for OAuth users
+  username          String? // Nullable for OAuth users, no spaces
+  name              String? // Full name (first and last name)
   profilePictureUrl String?
+  googleId          String? // Google OAuth user ID
   teamId            Int?
+  termsAccepted     Boolean @default(false) // New field for terms agreement
 
-  authoredTasks   Task[]           @relation("TaskAuthor")
-  assignedTasks   Task[]           @relation("TaskAssignee")
-  taskAssignments TaskAssignment[]
-  attachments     Attachment[]
-  comments        Comment[]
-  team            Team?            @relation(fields: [teamId], references: [id])
+  authoredTasks  Task[]           @relation("TaskAuthor")
+  assignedTasks  Task[]           @relation("TaskAssignee")
+  attachments    Attachment[]
+  comments       Comment[]
+  team           Team?            @relation(fields: [teamId], references: [id])
+  TaskAssignment TaskAssignment[]
+  Session        Session[]
 }
 
 model Team {
@@ -36,6 +41,15 @@ model Team {
   projectManagerUserId Int?
   projectTeams         ProjectTeam[]
   user                 User[]
+}
+
+model Session {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique
+  userId    Int
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [userId])
 }
 
 model Project {
