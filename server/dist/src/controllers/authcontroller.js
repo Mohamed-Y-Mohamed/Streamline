@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.signOut = exports.googleSignIn = exports.signInUser = exports.registerUser = void 0;
+exports.getUserDetails = exports.signOut = exports.verifySession = exports.googleSignIn = exports.signInUser = exports.registerUser = void 0;
 const client_1 = require("@prisma/client");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const uuid_1 = require("uuid");
@@ -158,6 +158,22 @@ const googleSignIn = async (req, res) => {
     }
 };
 exports.googleSignIn = googleSignIn;
+const verifySession = async (req, res) => {
+    const sessionToken = req.cookies.session_token;
+    if (!sessionToken) {
+        res.status(401).json({ message: 'No session token provided' });
+        return;
+    }
+    const session = await prisma.session.findUnique({
+        where: { token: sessionToken },
+    });
+    if (!session || !session.token) {
+        res.status(401).json({ message: 'Invalid or expired session' });
+        return;
+    }
+    res.status(200).json({ message: 'Session valid', userId: session.userId });
+};
+exports.verifySession = verifySession;
 // Sign Out
 const signOut = async (req, res) => {
     try {
@@ -174,3 +190,32 @@ const signOut = async (req, res) => {
     }
 };
 exports.signOut = signOut;
+const getUserDetails = async (req, res) => {
+    const sessionToken = req.cookies.session_token;
+    if (!sessionToken) {
+        res.status(401).json({ message: "No session token provided" });
+        return; // Ensure the function ends after sending the response
+    }
+    const session = await prisma.session.findUnique({
+        where: { token: sessionToken },
+        include: { user: true },
+    });
+    if (!session || !session.user) {
+        res.status(401).json({ message: "Invalid or expired session" });
+        return;
+    }
+    const { user } = session;
+    res.status(200).json({
+        user: {
+            userId: user.userId,
+            username: user.username,
+            email: user.email,
+            profilePictureUrl: user.profilePictureUrl,
+            googleId: user.googleId,
+            teamId: user.teamId,
+            termsAccepted: user.termsAccepted,
+        },
+    });
+    return; // Ends the handler without returning a Response object
+};
+exports.getUserDetails = getUserDetails;

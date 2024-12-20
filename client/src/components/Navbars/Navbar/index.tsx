@@ -15,13 +15,11 @@ const Navbar = () => {
     (state) => state.global.isSidebarCollapsed
   );
   const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
-
   const {
-    data: user,
+    data: userData,
     isLoading: isUserLoading,
     error: userError,
   } = useGetUserDetailsQuery();
-
   const [signOut, { isLoading: isSigningOut }] = useSignOutMutation();
 
   // Handle sign out
@@ -107,7 +105,9 @@ const Navbar = () => {
               <div className="animate-pulse h-9 w-9 bg-gray-300 rounded-full"></div>
             ) : (
               <Image
-                src={user?.profilePictureUrl || "/assets/anonymous.png"}
+                src={
+                  userData?.user.profilePictureUrl || "/assets/annonymous.png"
+                }
                 alt="User Profile"
                 width={36}
                 height={36}
@@ -116,7 +116,7 @@ const Navbar = () => {
             )}
           </div>
           <span className="mx-3 text-gray-800 dark:text-white">
-            {isUserLoading ? "Loading..." : user?.username || "Guest"}
+            {isUserLoading ? "Loading..." : userData?.user.username || "Guest"}
           </span>
           <button
             onClick={handleSignOut}

@@ -178,6 +178,25 @@ export const googleSignIn: RequestHandler = async (req, res) => {
   }
 };
 
+
+export const verifySession: RequestHandler = async (req, res) => {
+  const sessionToken = req.cookies.session_token;
+  if (!sessionToken) {
+    res.status(401).json({ message: 'No session token provided' });
+    return;
+  }
+
+const session = await prisma.session.findUnique({
+  where: { token: sessionToken },
+});
+  if (!session || !session.token) {
+    res.status(401).json({ message: 'Invalid or expired session' });
+    return;
+  }
+
+  res.status(200).json({ message: 'Session valid', userId: session.userId });
+};
+
 // Sign Out
 export const signOut: RequestHandler = async (req, res) => {
   try {
@@ -191,4 +210,36 @@ export const signOut: RequestHandler = async (req, res) => {
     console.error("Error signing out:", error);
     res.status(500).json({ message: "Internal Server Error" });
   }
+};
+
+export const getUserDetails: RequestHandler = async (req, res) => {
+  const sessionToken = req.cookies.session_token;
+  if (!sessionToken) {
+    res.status(401).json({ message: "No session token provided" });
+    return; // Ensure the function ends after sending the response
+  }
+
+  const session = await prisma.session.findUnique({
+    where: { token: sessionToken },
+    include: { user: true },
+  });
+
+  if (!session || !session.user) {
+    res.status(401).json({ message: "Invalid or expired session" });
+    return;
+  }
+
+  const { user } = session;
+  res.status(200).json({
+    user: {
+      userId: user.userId,
+      username: user.username,
+      email: user.email,
+      profilePictureUrl: user.profilePictureUrl,
+      googleId: user.googleId,
+      teamId: user.teamId,
+      termsAccepted: user.termsAccepted,
+    },
+  });
+  return; // Ends the handler without returning a Response object
 };
