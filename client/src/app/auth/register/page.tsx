@@ -7,8 +7,8 @@ import Image from "next/image";
 import IntroNavbar from "@/components/Navbars/introNav";
 import Footer from "@/components/footer/footer";
 import { useAppSelector } from "@/app/redux";
-import axios from "axios";
 import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
+import { useRegisterUserMutation, useGoogleSignInMutation } from "@/state/api";
 
 const passwordRequirements = [
   { id: 1, label: "Minimum 8 characters", regex: /^.{8,}$/ },
@@ -38,6 +38,10 @@ const Register = () => {
   const [isTermsVisible, setIsTermsVisible] = useState(false);
 
   const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
+  const [registerUser, { isLoading: isRegistering }] =
+    useRegisterUserMutation();
+  const [googleSignIn, { isLoading: isGoogleSigningIn }] =
+    useGoogleSignInMutation();
 
   const validateFields = (name: string, value: string) => {
     let errorMessage = "";
@@ -83,14 +87,10 @@ const Register = () => {
     }
 
     try {
-      await axios.post(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/auth/register`,
-        formData,
-        { withCredentials: true }
-      );
+      await registerUser(formData).unwrap();
       alert("Registration successful!");
     } catch (error) {
-      console.log("Registration error:", error);
+      console.error("Registration error:", error);
       alert("Registration failed. Please try again.");
     }
   };
@@ -98,24 +98,26 @@ const Register = () => {
   const handleGoogleSignInSuccess = async (credentialResponse: any) => {
     if (credentialResponse && credentialResponse.credential) {
       try {
-        await axios.post(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/auth/google-signin`,
-          { idToken: credentialResponse.credential },
-          { withCredentials: true }
-        );
+        await googleSignIn({
+          idToken: credentialResponse.credential,
+        }).unwrap();
         alert("Google sign-in successful!");
       } catch (error) {
-        console.log("Google sign-in error:", error);
+        console.error("Google sign-in error:", error);
         alert("Google sign-in failed. Please try again.");
       }
     }
   };
 
+  const isAnyLoading = isRegistering || isGoogleSigningIn;
+
   return (
     <GoogleOAuthProvider clientId={clientId}>
       <IntroNavbar />
       <div
-        className={`font-[sans-serif] ${isDarkMode ? "bg-[#301934]" : "bg-white"} md:h-screen`}
+        className={`font-[sans-serif] ${
+          isDarkMode ? "bg-[#301934]" : "bg-white"
+        } md:h-screen`}
       >
         <div className="grid md:grid-cols-2 items-center gap-8 h-full">
           <div className="max-md:order-1 p-4">
@@ -129,7 +131,9 @@ const Register = () => {
           </div>
 
           <div
-            className={`flex items-center md:p-8 p-6 h-full lg:w-11/12 lg:ml-auto ${isDarkMode ? "bg-[#0C172C]" : "bg-gray-100"}`}
+            className={`flex items-center md:p-8 p-6 h-full lg:w-11/12 lg:ml-auto ${
+              isDarkMode ? "bg-[#0C172C]" : "bg-gray-100"
+            }`}
           >
             <form onSubmit={handleSubmit} className="max-w-lg w-full mx-auto">
               <div className="flex justify-center mb-4">
@@ -149,11 +153,10 @@ const Register = () => {
               <div className="mb-6">
                 <div className="w-full">
                   <GoogleLogin
-                    onSuccess={(credentialResponse) => {
-                      handleGoogleSignInSuccess(credentialResponse);
-                    }}
+                    onSuccess={handleGoogleSignInSuccess}
                     onError={() => {
-                      console.log("Google sign-in failed");
+                      console.error("Google sign-in failed");
+                      alert("Google sign-in failed. Please try again.");
                     }}
                   />
                 </div>
@@ -172,6 +175,7 @@ const Register = () => {
                     onChange={handleChange}
                     className="w-full bg-transparent text-sm text-white border-b border-gray-300 focus:border-yellow-400 px-2 py-3 outline-none"
                     placeholder="Enter full name"
+                    disabled={isAnyLoading}
                   />
                 </div>
                 {errors.name && (
@@ -192,6 +196,7 @@ const Register = () => {
                     onChange={handleChange}
                     className="w-full bg-transparent text-sm text-white border-b border-gray-300 focus:border-yellow-400 px-2 py-3 outline-none"
                     placeholder="Enter username"
+                    disabled={isAnyLoading}
                   />
                 </div>
                 {errors.username && (
@@ -210,6 +215,7 @@ const Register = () => {
                     onChange={handleChange}
                     className="w-full bg-transparent text-sm text-white border-b border-gray-300 focus:border-yellow-400 px-2 py-3 outline-none"
                     placeholder="Enter email"
+                    disabled={isAnyLoading}
                   />
                 </div>
                 {errors.email && (
@@ -231,11 +237,13 @@ const Register = () => {
                     onFocus={() => setPasswordFocus(true)}
                     className="w-full bg-transparent text-sm text-white border-b border-gray-300 focus:border-yellow-400 px-2 py-3 outline-none"
                     placeholder="Enter password"
+                    disabled={isAnyLoading}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-2 top-3 text-gray-400"
+                    disabled={isAnyLoading}
                   >
                     {showPassword ? <AiFillEyeInvisible /> : <AiFillEye />}
                   </button>
@@ -266,11 +274,12 @@ const Register = () => {
                   checked={formData.termsAccepted}
                   readOnly
                   className="h-4 w-4 rounded"
+                  disabled={isAnyLoading}
                 />
                 <label
                   htmlFor="termsAccepted"
                   className="text-white ml-3 block text-sm cursor-pointer"
-                  onClick={() => setIsTermsVisible(true)}
+                  onClick={() => !isAnyLoading && setIsTermsVisible(true)}
                 >
                   I accept the{" "}
                   <span className="text-yellow-400 underline">
@@ -283,9 +292,10 @@ const Register = () => {
               <div className="mb-12">
                 <button
                   type="submit"
+                  disabled={isAnyLoading}
                   className="w-full py-3 text-gray-800 font-semibold rounded-md bg-yellow-400 hover:bg-yellow-500"
                 >
-                  Register
+                  {isRegistering ? "Registering..." : "Register"}
                 </button>
                 <p className="text-sm text-white mt-8">
                   Already have an account?{" "}
@@ -320,8 +330,10 @@ const Register = () => {
               <button
                 className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
                 onClick={() => {
-                  setFormData((prev) => ({ ...prev, termsAccepted: true }));
-                  setIsTermsVisible(false);
+                  if (!isAnyLoading) {
+                    setFormData((prev) => ({ ...prev, termsAccepted: true }));
+                    setIsTermsVisible(false);
+                  }
                 }}
               >
                 Accept
@@ -329,7 +341,9 @@ const Register = () => {
               <button
                 className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
                 onClick={() => {
-                  setIsTermsVisible(false);
+                  if (!isAnyLoading) {
+                    setIsTermsVisible(false);
+                  }
                 }}
               >
                 Decline

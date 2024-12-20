@@ -74,7 +74,17 @@ export interface Team {
   projectManagerUserId?: number;
 }
 
-// Adjusted response types to match what the backend actually returns
+// Adjusted response types to match what the backend actually returnsimport { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+
+export interface Project { /* ... */ }
+export enum Priority { /* ... */ }
+export enum Status { /* ... */ }
+export interface User { /* ... */ }
+export interface Attachment { /* ... */ }
+export interface Task { /* ... */ }
+export interface SearchResults { /* ... */ }
+export interface Team { /* ... */ }
+
 interface AuthResponse {
   message: string;
   user: User;
@@ -88,19 +98,17 @@ interface RegisterResponse {
 export const api = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: process.env.NEXT_PUBLIC_BASE_URL,
-    credentials: 'include', // ensure cookies are included
+    credentials: 'include',
   }),
   reducerPath: "api",
   tagTypes: ["Projects", "Tasks", "Users"],
 
   endpoints: (build) => ({
-    // Fetch Projects
     getProjects: build.query<Project[], void>({
       query: () => "projects",
       providesTags: ["Projects"],
     }),
 
-    // Create a New Project
     createProject: build.mutation<Project, Partial<Project>>({
       query: (project) => ({
         url: "projects",
@@ -110,16 +118,14 @@ export const api = createApi({
       invalidatesTags: ["Projects"],
     }),
 
-    // Fetch Tasks by Project ID
     getTasks: build.query<Task[], { projectId: number }>({
       query: ({ projectId }) => `tasks?projectId=${projectId}`,
       providesTags: (result) =>
         result
-          ? result.map(({ id }) => ({ type: "Tasks" as const, id }))
-          : ["Tasks" as const],
+          ? result.map(({ id }) => ({ type: "Tasks", id }))
+          : ["Tasks"],
     }),
 
-    // Create a New Task
     createTask: build.mutation<Task, Partial<Task>>({
       query: (task) => ({
         url: "tasks",
@@ -129,7 +135,6 @@ export const api = createApi({
       invalidatesTags: ["Tasks"],
     }),
 
-    // Update Task Status
     updateTaskStatus: build.mutation<Task, { taskId: number; status: string }>({
       query: ({ taskId, status }) => ({
         url: `tasks/${taskId}/status`,
@@ -139,7 +144,6 @@ export const api = createApi({
       invalidatesTags: (result, error, { taskId }) => [{ type: "Tasks", id: taskId }],
     }),
 
-    // User Registration
     registerUser: build.mutation<RegisterResponse, Partial<User>>({
       query: (user) => ({
         url: "auth/register",
@@ -148,7 +152,6 @@ export const api = createApi({
       }),
     }),
 
-    // Google Sign-In
     googleSignIn: build.mutation<AuthResponse, { idToken: string }>({
       query: (payload) => ({
         url: "auth/google-signin",
@@ -157,7 +160,6 @@ export const api = createApi({
       }),
     }),
 
-    // Regular Sign-In
     signIn: build.mutation<AuthResponse, { email: string; password: string }>({
       query: (credentials) => ({
         url: "auth/signin",
@@ -166,28 +168,25 @@ export const api = createApi({
       }),
     }),
 
-    // Search for Projects, Tasks, or Users
     search: build.query<SearchResults, string>({
       query: (query) => `search?query=${query}`,
     }),
+
     signOut: build.mutation<{ message: string }, void>({
-  query: () => ({
-    url: "auth/signout",
-    method: "POST",
+      query: () => ({
+        url: "auth/signout",
+        method: "POST",
+      }),
+    }),
+
+    getUserDetails: build.query<User, void>({
+      query: () => "auth/user",
+    }),
   }),
-}),
-
-getUserDetails: build.query<User, void>({
-  query: () => "auth/user",
-}),
-
-
-  }),
-  
 });
 
-// Export Hooks for Components
 export const {
+  useSearchQuery,
   useGetProjectsQuery,
   useCreateProjectMutation,
   useGetTasksQuery,
@@ -196,7 +195,6 @@ export const {
   useRegisterUserMutation,
   useGoogleSignInMutation,
   useSignInMutation,
-  useSignOutMutation, 
-    useGetUserDetailsQuery, 
-
+  useSignOutMutation,
+  useGetUserDetailsQuery,
 } = api;

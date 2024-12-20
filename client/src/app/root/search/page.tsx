@@ -1,11 +1,11 @@
 "use client";
 
 import Header from "@/components/Header";
-import ProjectCard from "@/components/ModalNewTask";
+import ProjectCard from "@/components/ProjectCard";
 import TaskCard from "@/components/taskCard/taskcard";
-// import UserCard from "@/components/UserCard";
+import UserCard from "@/components/UserCard";
 import { useSearchQuery } from "@/state/api";
-// import { debounce } from "lodash";
+import { debounce } from "lodash";
 import React, { useEffect, useState } from "react";
 
 const Search = () => {
@@ -18,16 +18,16 @@ const Search = () => {
     skip: searchTerm.length < 3,
   });
 
-  //   const handleSearch = debounce(
-  //     (event: React.ChangeEvent<HTMLInputElement>) => {
-  //       setSearchTerm(event.target.value);
-  //     },
-  //     500
-  //   );
+  const handleSearch = debounce(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setSearchTerm(event.target.value);
+    },
+    500
+  );
 
-  //   useEffect(() => {
-  //     return handleSearch.cancel;
-  //   }, [handleSearch.cancel]);
+  useEffect(() => {
+    return handleSearch.cancel;
+  }, [handleSearch.cancel]);
 
   return (
     <div className="p-8">
@@ -36,8 +36,8 @@ const Search = () => {
         <input
           type="text"
           placeholder="Search..."
-          className="w-1/2 rounded border p-3 shadow"
-          //   onChange={handleSearch}
+          className="w-1/2 rounded border p-3 shadow bg-white text-black dark:bg-dark-secondary dark:text-gray-100"
+          onChange={handleSearch}
         />
       </div>
       <div className="p-5">
@@ -55,16 +55,16 @@ const Search = () => {
             {searchResults.projects && searchResults.projects?.length > 0 && (
               <h2>Projects</h2>
             )}
-            {/* {searchResults.projects?.map((project) => (
+            {searchResults.projects?.map((project) => (
               <ProjectCard key={project.id} project={project} />
-            ))} */}
+            ))}
 
             {searchResults.users && searchResults.users?.length > 0 && (
               <h2>Users</h2>
             )}
-            {/* {searchResults.users?.map((user) => (
+            {searchResults.users?.map((user) => (
               <UserCard key={user.userId} user={user} />
-            ))} */}
+            ))}
           </div>
         )}
       </div>
