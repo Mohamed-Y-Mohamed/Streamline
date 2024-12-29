@@ -1,4 +1,6 @@
-import { useRef } from "react";
+"use client";
+
+import { useMemo } from "react";
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import {
   TypedUseSelectorHook,
@@ -24,19 +26,17 @@ import { PersistGate } from "redux-persist/integration/react";
 import createWebStorage from "redux-persist/lib/storage/createWebStorage";
 
 /* REDUX PERSISTENCE */
-const createNoopStorage = () => {
-  return {
-    getItem(_key: any) {
-      return Promise.resolve(null);
-    },
-    setItem(_key: any, value: any) {
-      return Promise.resolve(value);
-    },
-    removeItem(_key: any) {
-      return Promise.resolve();
-    },
-  };
-};
+const createNoopStorage = () => ({
+  getItem(_key: any) {
+    return Promise.resolve(null);
+  },
+  setItem(_key: any, value: any) {
+    return Promise.resolve(value);
+  },
+  removeItem(_key: any) {
+    return Promise.resolve();
+  },
+});
 
 const storage =
   typeof window === "undefined"
@@ -48,6 +48,7 @@ const persistConfig = {
   storage,
   whitelist: ["global"],
 };
+
 const rootReducer = combineReducers({
   global: globalReducer,
   [api.reducerPath]: api.reducer,
@@ -55,8 +56,8 @@ const rootReducer = combineReducers({
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 /* REDUX STORE */
-export const makeStore = () => {
-  return configureStore({
+export const makeStore = () =>
+  configureStore({
     reducer: persistedReducer,
     middleware: (getDefault) =>
       getDefault({
@@ -65,7 +66,6 @@ export const makeStore = () => {
         },
       }).concat(api.middleware),
   });
-};
 
 /* REDUX TYPES */
 export type AppStore = ReturnType<typeof makeStore>;
@@ -80,15 +80,18 @@ export default function StoreProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const storeRef = useRef<AppStore>();
-  if (!storeRef.current) {
-    storeRef.current = makeStore();
-    setupListeners(storeRef.current.dispatch);
-  }
-  const persistor = persistStore(storeRef.current);
+  // Memoize store to prevent unnecessary recalculations
+  const store = useMemo(() => {
+    const store = makeStore();
+    setupListeners(store.dispatch);
+    return store;
+  }, []);
+
+  // Memoize persistor for consistency
+  const persistor = useMemo(() => persistStore(store), [store]);
 
   return (
-    <Provider store={storeRef.current}>
+    <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
         {children}
       </PersistGate>

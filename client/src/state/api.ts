@@ -28,9 +28,8 @@ export interface User {
   username: string;
   email: string;
   profilePictureUrl?: string;
-  googleId?: string;
+  cognitoId?: string;
   teamId?: number;
-  termsAccepted?: boolean;
 }
 
 export interface Attachment {
@@ -74,41 +73,18 @@ export interface Team {
   projectManagerUserId?: number;
 }
 
-// Adjusted response types to match what the backend actually returnsimport { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-
-export interface Project { /* ... */ }
-export enum Priority { /* ... */ }
-export enum Status { /* ... */ }
-export interface User { /* ... */ }
-export interface Attachment { /* ... */ }
-export interface Task { /* ... */ }
-export interface SearchResults { /* ... */ }
-export interface Team { /* ... */ }
-
-interface AuthResponse {
-  message: string;
-  user: User;
-}
-
-interface RegisterResponse {
-  message: string;
-  user: User;
-}
-
 export const api = createApi({
   baseQuery: fetchBaseQuery({
-    baseUrl: process.env.NEXT_PUBLIC_BASE_URL,
-    credentials: 'include',
+    baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL,
   }),
   reducerPath: "api",
-  tagTypes: ["Projects", "Tasks", "Users"],
-
+  tagTypes: ["Projects", "Tasks", "Users", "Teams"],
   endpoints: (build) => ({
+ 
     getProjects: build.query<Project[], void>({
       query: () => "projects",
       providesTags: ["Projects"],
     }),
-
     createProject: build.mutation<Project, Partial<Project>>({
       query: (project) => ({
         url: "projects",
@@ -117,15 +93,20 @@ export const api = createApi({
       }),
       invalidatesTags: ["Projects"],
     }),
-
     getTasks: build.query<Task[], { projectId: number }>({
       query: ({ projectId }) => `tasks?projectId=${projectId}`,
       providesTags: (result) =>
         result
-          ? result.map(({ id }) => ({ type: "Tasks", id }))
-          : ["Tasks"],
+          ? result.map(({ id }) => ({ type: "Tasks" as const, id }))
+          : [{ type: "Tasks" as const }],
     }),
-
+    getTasksByUser: build.query<Task[], number>({
+      query: (userId) => `tasks/user/${userId}`,
+      providesTags: (result, error, userId) =>
+        result
+          ? result.map(({ id }) => ({ type: "Tasks", id }))
+          : [{ type: "Tasks", id: userId }],
+    }),
     createTask: build.mutation<Task, Partial<Task>>({
       query: (task) => ({
         url: "tasks",
@@ -134,67 +115,38 @@ export const api = createApi({
       }),
       invalidatesTags: ["Tasks"],
     }),
-
     updateTaskStatus: build.mutation<Task, { taskId: number; status: string }>({
       query: ({ taskId, status }) => ({
         url: `tasks/${taskId}/status`,
         method: "PATCH",
         body: { status },
       }),
-      invalidatesTags: (result, error, { taskId }) => [{ type: "Tasks", id: taskId }],
+      invalidatesTags: (result, error, { taskId }) => [
+        { type: "Tasks", id: taskId },
+      ],
     }),
-
-    registerUser: build.mutation<RegisterResponse, Partial<User>>({
-      query: (user) => ({
-        url: "auth/register",
-        method: "POST",
-        body: user,
-      }),
+    getUsers: build.query<User[], void>({
+      query: () => "users",
+      providesTags: ["Users"],
     }),
-
-    googleSignIn: build.mutation<AuthResponse, { idToken: string }>({
-      query: (payload) => ({
-        url: "auth/google-signin",
-        method: "POST",
-        body: payload,
-      }),
+    getTeams: build.query<Team[], void>({
+      query: () => "teams",
+      providesTags: ["Teams"],
     }),
-
-    signIn: build.mutation<AuthResponse, { email: string; password: string }>({
-      query: (credentials) => ({
-        url: "auth/signin",
-        method: "POST",
-        body: credentials,
-      }),
-    }),
-
     search: build.query<SearchResults, string>({
       query: (query) => `search?query=${query}`,
-    }),
-
-    signOut: build.mutation<{ message: string }, void>({
-      query: () => ({
-        url: "auth/signout",
-        method: "POST",
-      }),
-    }),
-
-    getUserDetails: build.query<User, void>({
-      query: () => "auth/user",
     }),
   }),
 });
 
 export const {
-  useSearchQuery,
   useGetProjectsQuery,
   useCreateProjectMutation,
   useGetTasksQuery,
   useCreateTaskMutation,
   useUpdateTaskStatusMutation,
-  useRegisterUserMutation,
-  useGoogleSignInMutation,
-  useSignInMutation,
-  useSignOutMutation,
-  useGetUserDetailsQuery,
+  useSearchQuery,
+  useGetUsersQuery,
+  useGetTeamsQuery,
+  useGetTasksByUserQuery,
 } = api;

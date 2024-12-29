@@ -1,44 +1,40 @@
-import express from "express";
-import * as dotenv from "dotenv";
+import express, { Request, Response } from "express";
+import dotenv from "dotenv";
 import bodyParser from "body-parser";
 import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
-import cookieParser from "cookie-parser";
-
-import authRoutes from "./routes/signinRoute";
+/* ROUTE IMPORTS */
 import projectRoutes from "./routes/projectRoutes";
 import taskRoutes from "./routes/taskRoutes";
 import searchRoutes from "./routes/searchRoutes";
+import userRoutes from "./routes/userRoutes";
+import teamRoutes from "./routes/teamRoutes";
 
+/* CONFIGURATIONS */
 dotenv.config();
-
 const app = express();
-
-// Middleware
 app.use(express.json());
 app.use(helmet());
+app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
 app.use(morgan("common"));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cors({
-  origin: "http://localhost:3000",
-  credentials: true,
-}));
-app.use(cookieParser());
+app.use(cors());
 
-// Routes
+/* ROUTES */
 app.get("/", (req, res) => {
-  res.send("Home Route");
+  res.send("This is home route");
 });
-app.use("/auth", authRoutes);
+
 app.use("/projects", projectRoutes);
 app.use("/tasks", taskRoutes);
 app.use("/search", searchRoutes);
+app.use("/users", userRoutes);
+app.use("/teams", teamRoutes);
 
-const PORT = process.env.PORT || 8000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+/* SERVER */
+const port = Number(process.env.PORT) || 3000;
+app.listen(port, "0.0.0.0", () => {
+  console.log(`Server running on part ${port}`);
 });
-
-export default app;
