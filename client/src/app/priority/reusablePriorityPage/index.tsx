@@ -5,12 +5,7 @@ import Header from "@/components/Header";
 import ModalNewTask from "@/components/ModalNewTask";
 import TaskCard from "@/components/TaskCard";
 import { dataGridClassNames, dataGridSxStyles } from "@/lib/utils";
-import {
-  Priority,
-  Task,
-  useGetAuthUserQuery,
-  useGetTasksByUserQuery,
-} from "@/state/api";
+import { Priority, Task, useGetTasksByUserQuery } from "@/state/api";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import React, { useState } from "react";
 
@@ -77,8 +72,7 @@ const ReusablePriorityPage = ({ priority }: Props) => {
   const [view, setView] = useState("list");
   const [isModalNewTaskOpen, setIsModalNewTaskOpen] = useState(false);
 
-  const { data: currentUser } = useGetAuthUserQuery({});
-  const userId = currentUser?.userDetails?.userId ?? null;
+  const userId = 1;
   const {
     data: tasks,
     isLoading,
@@ -90,7 +84,7 @@ const ReusablePriorityPage = ({ priority }: Props) => {
   const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
 
   const filteredTasks = tasks?.filter(
-    (task: Task) => task.priority === priority,
+    (task: Task) => task.priority === priority
   );
 
   if (isTasksError || !tasks) return <div>Error fetching tasks</div>;

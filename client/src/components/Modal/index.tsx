@@ -31,7 +31,7 @@ const Modal = ({ children, isOpen, onClose, name }: Props) => {
         {children}
       </div>
     </div>,
-    document.body,
+    document.body
   );
 };
 
