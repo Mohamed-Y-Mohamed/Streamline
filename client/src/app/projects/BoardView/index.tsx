@@ -6,6 +6,7 @@ import { Task as TaskType } from "@/state/api";
 import { EllipsisVertical, MessageSquareMore, Plus } from "lucide-react";
 import { format } from "date-fns";
 import Image from "next/image";
+import { DragSourceMonitor, DropTargetMonitor } from "react-dnd";
 
 type BoardProps = {
   id: string;
@@ -62,7 +63,7 @@ const TaskColumn = ({
   const [{ isOver }, drop] = useDrop(() => ({
     accept: "task",
     drop: (item: { id: number }) => moveTask(item.id, status),
-    collect: (monitor: any) => ({
+    collect: (monitor: DropTargetMonitor) => ({
       isOver: !!monitor.isOver(),
     }),
   }));

@@ -1,3 +1,4 @@
+// Updated Redux Configuration
 "use client";
 
 import { useMemo } from "react";
@@ -25,15 +26,14 @@ import {
 import { PersistGate } from "redux-persist/integration/react";
 import createWebStorage from "redux-persist/lib/storage/createWebStorage";
 
-/* REDUX PERSISTENCE */
 const createNoopStorage = () => ({
-  getItem(_key: any) {
+  getItem(_key: string) {
     return Promise.resolve(null);
   },
-  setItem(_key: any, value: any) {
+  setItem(_key: string, value: string) {
     return Promise.resolve(value);
   },
-  removeItem(_key: any) {
+  removeItem(_key: string) {
     return Promise.resolve();
   },
 });
@@ -55,7 +55,6 @@ const rootReducer = combineReducers({
 });
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
-/* REDUX STORE */
 export const makeStore = () =>
   configureStore({
     reducer: persistedReducer,
@@ -67,27 +66,23 @@ export const makeStore = () =>
       }).concat(api.middleware),
   });
 
-/* REDUX TYPES */
 export type AppStore = ReturnType<typeof makeStore>;
 export type RootState = ReturnType<AppStore["getState"]>;
 export type AppDispatch = AppStore["dispatch"];
 export const useAppDispatch = () => useDispatch<AppDispatch>();
 export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
 
-/* PROVIDER */
 export default function StoreProvider({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  // Memoize store to prevent unnecessary recalculations
   const store = useMemo(() => {
     const store = makeStore();
     setupListeners(store.dispatch);
     return store;
   }, []);
 
-  // Memoize persistor for consistency
   const persistor = useMemo(() => persistStore(store), [store]);
 
   return (
