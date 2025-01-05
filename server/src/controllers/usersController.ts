@@ -36,8 +36,8 @@ export const postUser = async (req: Request, res: Response) => {
     const {
       username,
       cognitoId,
-      profilePictureUrl = "i1.jpg",
-      teamId = 1,
+      profilePictureUrl = "",
+      teamId = 0,
     } = req.body;
     const newUser = await prisma.user.create({
       data: {
