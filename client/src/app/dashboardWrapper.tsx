@@ -1,23 +1,27 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React from "react";
 import Navbar from "@/components/Navbar";
 import Sidebar from "@/components/Sidebar";
-import StoreProvider, { useAppSelector } from "./redux";
-import AuthProvider from "./AuthProvider";
-const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
+import StoreProvider, { useAppSelector } from "@/app/redux";
+import AuthProvider from "@/app/AuthProvider";
+
+interface DashboardWrapperProps {
+  children: React.ReactNode;
+}
+
+const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const isSidebarCollapsed = useAppSelector(
     (state) => state.global.isSidebarCollapsed
   );
   const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
 
-  useEffect(() => {
-    if (isDarkMode) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-  }, [isDarkMode]); // Only re-run when `isDarkMode` changes
+  React.useEffect(() => {
+    if (isDarkMode) document.documentElement.classList.add("dark");
+    else document.documentElement.classList.remove("dark");
+  }, [isDarkMode]);
 
   return (
     <div className="flex min-h-screen w-full bg-gray-50 text-gray-900">
@@ -34,7 +38,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-const DashboardWrapper = ({ children }: { children: React.ReactNode }) => {
+const DashboardWrapper: React.FC<DashboardWrapperProps> = ({ children }) => {
   return (
     <StoreProvider>
       <AuthProvider>

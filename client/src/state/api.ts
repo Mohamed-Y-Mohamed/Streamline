@@ -75,7 +75,7 @@ export interface Team {
 
 export const api = createApi({
   baseQuery: fetchBaseQuery({
-    baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL,
+baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL, // Correct
   }),
   reducerPath: "api",
   tagTypes: ["Projects", "Tasks", "Users", "Teams"],
