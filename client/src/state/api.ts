@@ -141,6 +141,14 @@ export const api = createApi({
       }),
       invalidatesTags: ["Tasks"],
     }),
+    addUserToProject: build.mutation<void, { projectId: number; userId: number }>({
+  query: ({ projectId, userId }) => ({
+    url: `projects/${projectId}/addUser`,
+    method: "POST",
+    body: { userId },
+  }),
+  invalidatesTags: ["Projects", "Users"],
+}),
     updateTaskStatus: build.mutation<Task, { taskId: number; status: string }>({
       query: ({ taskId, status }) => ({
         url: `tasks/${taskId}/status`,
@@ -176,4 +184,6 @@ export const {
   useGetTeamsQuery,
   useGetTasksByUserQuery,
   useGetAuthUserQuery,
+    useAddUserToProjectMutation,
+
 } = api;

@@ -1,5 +1,6 @@
 "use client";
 
+import React, { useState } from "react";
 import {
   Priority,
   Project,
@@ -7,7 +8,6 @@ import {
   useGetProjectsQuery,
   useGetTasksQuery,
 } from "@/state/api";
-import React from "react";
 import { useAppSelector } from "../redux";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import Header from "@/components/Header";
@@ -25,6 +25,7 @@ import {
   YAxis,
 } from "recharts";
 import { dataGridClassNames, dataGridSxStyles } from "@/lib/utils";
+import ModalNewProject from "../projects/ModalNewProject";
 
 const taskColumns: GridColDef[] = [
   { field: "title", headerName: "Title", width: 200 },
@@ -36,26 +37,40 @@ const taskColumns: GridColDef[] = [
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042"];
 
 const HomePage = () => {
+  const [selectedProjectId, setSelectedProjectId] = useState<number | null>(
+    null
+  );
+  const [isModalNewProjectOpen, setIsModalNewProjectOpen] = useState(false);
+
+  const {
+    data: projects,
+    isLoading: isProjectsLoading,
+    isError: isProjectsError,
+  } = useGetProjectsQuery();
   const {
     data: tasks,
     isLoading: tasksLoading,
     isError: tasksError,
-  } = useGetTasksQuery({ projectId: parseInt("1") });
-  const { data: projects, isLoading: isProjectsLoading } =
-    useGetProjectsQuery();
+  } = useGetTasksQuery(
+    selectedProjectId !== null
+      ? { projectId: selectedProjectId }
+      : { projectId: 0 } // Default to 0 if no project selected
+  );
 
   const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
 
-  if (tasksLoading || isProjectsLoading) return <div>Loading..</div>;
-  if (tasksError || !tasks || !projects) return <div>Error fetching data</div>;
+  if (isProjectsLoading || tasksLoading) return <div>Loading...</div>;
+  if (isProjectsError || !projects) return <div>Error fetching projects</div>;
+  if (tasksError || !tasks) return <div>Error fetching tasks</div>;
 
+  // Handle Task Priority Distribution
   const priorityCount = tasks.reduce(
     (acc: Record<string, number>, task: Task) => {
       const { priority } = task;
       acc[priority as Priority] = (acc[priority as Priority] || 0) + 1;
       return acc;
     },
-    {},
+    {}
   );
 
   const taskDistribution = Object.keys(priorityCount).map((key) => ({
@@ -63,19 +78,13 @@ const HomePage = () => {
     count: priorityCount[key],
   }));
 
-  const statusCount = projects.reduce(
-    (acc: Record<string, number>, project: Project) => {
-      const status = project.endDate ? "Completed" : "Active";
-      acc[status] = (acc[status] || 0) + 1;
-      return acc;
-    },
-    {},
-  );
-
-  const projectStatus = Object.keys(statusCount).map((key) => ({
-    name: key,
-    count: statusCount[key],
-  }));
+  // Handle Project Status Distribution
+  const projectStatus = projects
+    .filter((project) => project.id === selectedProjectId) // Only include selected project
+    .map((project) => ({
+      name: project.endDate ? "Completed" : "Active",
+      count: 1,
+    }));
 
   const chartColors = isDarkMode
     ? {
@@ -93,8 +102,49 @@ const HomePage = () => {
 
   return (
     <div className="container h-full w-[100%] bg-gray-100 bg-transparent p-8">
-      <Header name="Project Management Dashboard" />
+      {/* Create Project Modal */}
+      <ModalNewProject
+        isOpen={isModalNewProjectOpen}
+        onClose={() => setIsModalNewProjectOpen(false)}
+      />
+
+      {/* Header Section */}
+      <div className="flex justify-between items-center mb-6">
+        <Header name="Project Management Dashboard" />
+        <button
+          className="flex items-center rounded-md bg-blue-primary px-3 py-2 text-white hover:bg-blue-600"
+          onClick={() => setIsModalNewProjectOpen(true)}
+        >
+          Create Project
+        </button>
+      </div>
+
+      {/* Project Selector */}
+      <div className="mb-6">
+        <label className="block text-lg font-medium mb-2 dark:text-white">
+          Select a Project:
+        </label>
+        <select
+          value={selectedProjectId || ""}
+          onChange={(e) =>
+            setSelectedProjectId(
+              e.target.value ? parseInt(e.target.value) : null
+            )
+          }
+          className="w-full p-2 border rounded dark:bg-dark-secondary dark:border-dark-tertiary dark:text-white"
+        >
+          <option value="">-- Select Project --</option>
+          {projects.map((project) => (
+            <option key={project.id} value={project.id}>
+              {project.name}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* Charts and Data */}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        {/* Task Priority Distribution */}
         <div className="rounded-lg bg-white p-4 shadow dark:bg-dark-secondary">
           <h3 className="mb-4 text-lg font-semibold dark:text-white">
             Task Priority Distribution
@@ -107,17 +157,14 @@ const HomePage = () => {
               />
               <XAxis dataKey="name" stroke={chartColors.text} />
               <YAxis stroke={chartColors.text} />
-              <Tooltip
-                contentStyle={{
-                  width: "min-content",
-                  height: "min-content",
-                }}
-              />
+              <Tooltip />
               <Legend />
               <Bar dataKey="count" fill={chartColors.bar} />
             </BarChart>
           </ResponsiveContainer>
         </div>
+
+        {/* Project Status */}
         <div className="rounded-lg bg-white p-4 shadow dark:bg-dark-secondary">
           <h3 className="mb-4 text-lg font-semibold dark:text-white">
             Project Status
@@ -137,6 +184,8 @@ const HomePage = () => {
             </PieChart>
           </ResponsiveContainer>
         </div>
+
+        {/* Task Data Grid */}
         <div className="rounded-lg bg-white p-4 shadow dark:bg-dark-secondary md:col-span-2">
           <h3 className="mb-4 text-lg font-semibold dark:text-white">
             Your Tasks
