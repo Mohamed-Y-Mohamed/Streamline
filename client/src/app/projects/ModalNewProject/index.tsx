@@ -2,6 +2,7 @@ import Modal from "@/components/Modal";
 import { useCreateProjectMutation } from "@/state/api";
 import React, { useState } from "react";
 import { formatISO } from "date-fns";
+import { on } from "events";
 
 type Props = {
   isOpen: boolean;
@@ -24,6 +25,7 @@ const ModalNewProject = ({ isOpen, onClose }: Props) => {
     const formattedEndDate = formatISO(new Date(endDate), {
       representation: "complete",
     });
+    onClose();
 
     await createProject({
       name: projectName,

@@ -24,9 +24,16 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { Status } from "@/state/api";
+
 import { dataGridClassNames, dataGridSxStyles } from "@/lib/utils";
 import ModalNewProject from "../projects/ModalNewProject";
-
+const allStatuses = [
+  Status.ToDo,
+  Status.WorkInProgress,
+  Status.UnderReview,
+  Status.Completed,
+];
 const taskColumns: GridColDef[] = [
   { field: "title", headerName: "Title", width: 200 },
   { field: "status", headerName: "Status", width: 150 },
@@ -78,13 +85,18 @@ const HomePage = () => {
     count: priorityCount[key],
   }));
 
-  // Handle Project Status Distribution
-  const projectStatus = projects
-    .filter((project) => project.id === selectedProjectId) // Only include selected project
-    .map((project) => ({
-      name: project.endDate ? "Completed" : "Active",
-      count: 1,
-    }));
+  const projectStatus = allStatuses.map((status) => ({
+    name: status, // Use the status name from the enum
+    count: tasks.filter((task) => task.status === status).length,
+  }));
+
+  // Convert the status object to an array and sort it alphabetically by name
+  const sortedProjectStatus = Object.keys(projectStatus)
+    .map((status) => ({
+      name: status,
+      count: projectStatus[status],
+    }))
+    .sort((a, b) => a.name.localeCompare(b.name));
 
   const chartColors = isDarkMode
     ? {
@@ -171,7 +183,12 @@ const HomePage = () => {
           </h3>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
-              <Pie dataKey="count" data={projectStatus} fill="#82ca9d" label>
+              <Pie
+                dataKey="count"
+                data={projectStatus}
+                fill="#82ca9d"
+                label={(entry) => `${entry.name}: ${entry.count}`}
+              >
                 {projectStatus.map((entry, index) => (
                   <Cell
                     key={`cell-${index}`}
