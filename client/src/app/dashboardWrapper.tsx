@@ -41,9 +41,9 @@ const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({
 const DashboardWrapper: React.FC<DashboardWrapperProps> = ({ children }) => {
   return (
     <StoreProvider>
-      <AuthProvider>
-        <DashboardLayout>{children}</DashboardLayout>
-      </AuthProvider>
+      {/* <AuthProvider> */}
+      <DashboardLayout>{children}</DashboardLayout>
+      {/* </AuthProvider> */}
     </StoreProvider>
   );
 };

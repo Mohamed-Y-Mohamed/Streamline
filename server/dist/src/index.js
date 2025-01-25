@@ -36,6 +36,6 @@ app.use("/users", userRoutes_1.default);
 app.use("/teams", teamRoutes_1.default);
 /* SERVER */
 const port = Number(process.env.PORT) || 3000;
-app.listen(port, "0.0.0.0", () => {
+app.listen(port, () => {
     console.log(`Server running on part ${port}`);
 });

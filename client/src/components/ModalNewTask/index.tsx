@@ -2,13 +2,11 @@ import Modal from "@/components/Modal";
 import { Priority, Status, useCreateTaskMutation } from "@/state/api";
 import React, { useState } from "react";
 import { formatISO } from "date-fns";
-
 type Props = {
   isOpen: boolean;
   onClose: () => void;
   id?: string | null;
 };
-
 const ModalNewTask = ({ isOpen, onClose, id }: Props) => {
   const [createTask, { isLoading }] = useCreateTaskMutation();
   const [title, setTitle] = useState("");
@@ -21,17 +19,14 @@ const ModalNewTask = ({ isOpen, onClose, id }: Props) => {
   const [authorUserId, setAuthorUserId] = useState("");
   const [assignedUserId, setAssignedUserId] = useState("");
   const [projectId, setProjectId] = useState("");
-
   const handleSubmit = async () => {
-    if (!title || !authorUserId || !(id !== null || projectId)) return;
-
+    if (!title || !authorUserId) return;
     const formattedStartDate = formatISO(new Date(startDate), {
       representation: "complete",
     });
     const formattedDueDate = formatISO(new Date(dueDate), {
       representation: "complete",
     });
-
     await createTask({
       title,
       description,
@@ -42,20 +37,17 @@ const ModalNewTask = ({ isOpen, onClose, id }: Props) => {
       dueDate: formattedDueDate,
       authorUserId: parseInt(authorUserId),
       assignedUserId: parseInt(assignedUserId),
-      projectId: id !== null ? Number(id) : Number(projectId),
+      projectId: Number(id),
     });
+    onClose();
   };
-
   const isFormValid = () => {
-    return title && authorUserId && (id !== null || projectId);
+    return title && authorUserId;
   };
-
   const selectStyles =
-    "mb-4 block w-full rounded border border-gray-300 px-3 py-2 dark:border-dark-tertiary dark:bg-dark-tertiary dark:text-white dark:focus:outline-none";
-
+    "mb-4 block w-full rounded border border-gray-300 px-3 py-2 text-black bg-white dark:border-dark-tertiary dark:bg-dark-tertiary dark:text-white dark:focus:outline-none";
   const inputStyles =
-    "w-full rounded border border-gray-300 p-2 shadow-sm dark:border-dark-tertiary dark:bg-dark-tertiary dark:text-white dark:focus:outline-none";
-
+    "w-full rounded border border-gray-300 p-2 shadow-sm bg-white text-black dark:border-dark-tertiary dark:bg-dark-tertiary dark:text-white dark:focus:outline-none";
   return (
     <Modal isOpen={isOpen} onClose={onClose} name="Create New Task">
       <form
@@ -114,17 +106,16 @@ const ModalNewTask = ({ isOpen, onClose, id }: Props) => {
           value={tags}
           onChange={(e) => setTags(e.target.value)}
         />
-
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-2">
           <input
             type="date"
-            className={inputStyles}
+            className={`${inputStyles} date-input`}
             value={startDate}
             onChange={(e) => setStartDate(e.target.value)}
           />
           <input
             type="date"
-            className={inputStyles}
+            className={`${inputStyles} date-input`}
             value={dueDate}
             onChange={(e) => setDueDate(e.target.value)}
           />
@@ -165,5 +156,4 @@ const ModalNewTask = ({ isOpen, onClose, id }: Props) => {
     </Modal>
   );
 };
-
 export default ModalNewTask;
