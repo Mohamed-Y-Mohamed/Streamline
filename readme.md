@@ -11,7 +11,6 @@
 - **Criticality Levels**: Visual representation of task urgency for effective prioritization.
 - **Responsive Design**: Optimized for all devices, ensuring usability on mobile and desktop.
 - **Theme Switching**: Toggle between **Dark Mode** and **Light Mode**.
-- **User Authentication**: Secure **Sign-In** and **Sign-Up** functionalities.
 
 ### Backend
 - **Robust Architecture**: Built with **Express.js** for efficient server-side logic.
@@ -23,8 +22,6 @@
 - **Data Grids**: Integrated **Material UI Data Grid** for handling and displaying complex data.
 - **State Management**: Simplified with **Redux Toolkit**.
 - **Data Fetching**: Efficient querying with **Redux Toolkit Query**.
-- **Serverless Integration**: Leveraged **AWS Lambda** for scalable backend operations.
-- **Authentication**: Managed via **AWS Cognito**.
 
 ---
 
@@ -106,13 +103,7 @@
 
 ---
 
-## 📺 Live Demo
 
-Check out the live version of the app here:  
-[**Live Application**](#)  
-*(Replace with the deployed URL once available.)*
-
----
 
 ## 📂 Project Structure
 
